@@ -1,0 +1,45 @@
+line,group,item,specification,qty,est_line_cost_usd,price_checked_2026-10-22
+1,Sensor Unit,"Raspberry Pi 5, 4 GB",After the 2026 memory-driven price rises,1,85,yes
+2,Sensor Unit,microSD card,"32 GB, high endurance",1,10,no
+3,Sensor Unit,Camera Module 3 Wide,"120° diagonal, 12 MP",1,45.05,yes
+4,Sensor Unit,"MLX90640 thermal camera, 55°",Adafruit 4407; out of stock at Adafruit on 22 Oct 2026,1,74.95,yes
+5,Sensor Unit,MG90S micro servo,"Metal gear, thermal pan",1,5,no
+6,Sensor Unit,USB–RS-485 adapter,"FTDI chip, with bias and termination",1,15,no
+7,Sensor Unit,Buck converter,"24→5.1 V, 5 A",1,12,no
+8,Sensor Unit,Enclosure,"IP65 ABS, 200 × 150 × 100, clear PC window",1,25,no
+9,Sensor Unit,RJ45 bulkhead,"IP67, one per unit",2,15,no
+10,Sensor Unit,Mast or pole,"5 m, with bracket or eave mount",1,45,no
+11,Turret Unit,ESP32 DevKitC,ESP32-WROOM-32,1,10,no
+12,Turret Unit,MAX3485 module,3.3 V RS-485 transceiver,1,3,no
+13,Turret Unit,Buck converter,"24→6.0 V, 5 A (servos)",1,10,no
+14,Turret Unit,Buck converter,"24→5 V, 2 A (logic)",1,5,no
+15,Turret Unit,Protection,"SMBJ28A, SS54, SM712, fuses and holders",1,10,no
+16,Turret Unit,Valve driver and passives,"IRLZ44N, 1N5819, resistors, capacitors, perfboard",1,10,no
+17,Turret Unit,Enclosure,"IP65 ABS, 160 × 110 × 75",1,15,no
+18,Turret Unit,Cable glands,"IP68, M12–M20 assortment",1,10,no
+19,Turret Unit,Pan servo,"25 kg·cm, 270°, metal gear, IP66/67",1,25,no
+20,Turret Unit,Tilt servo,"25 kg·cm, 180°, metal gear, IP66/67",1,25,no
+21,Turret Unit,Servo horns,25T aluminium disc,2,6,no
+22,Turret Unit,Turntable bearing,4 in square lazy susan,1,5,no
+23,Turret Unit,Bearing,608-2RS,1,1,no
+24,Turret Unit,Fasteners and inserts,"A2 stainless M2–M8 kit; brass heat-set inserts M3, M4",1,25,no
+25,Hydraulics,Vacuum breaker,"Hose-bibb, ASSE 1011",1,10,no
+26,Hydraulics,Y-filter,"200 mesh, ¾ in GHT",1,12,no
+27,Hydraulics,Pressure regulator,"25 psi, ¾ in GHT",1,10,no
+28,Hydraulics,Solenoid valve,"½ in, 24 V DC, normally closed",1,15,no
+29,Hydraulics,Flow meter,"Hall effect, 1–30 L/min, ½ in",1,8,no
+30,Hydraulics,Pressure transducer,"0–100 psi, 0.5–4.5 V, ¼ in NPT",1,15,no
+31,Hydraulics,Brass fittings,"Tee, adapters, barbs, clamps",1,20,no
+32,Hydraulics,Tube,"⅜ in ID reinforced PVC, 2 m",1,8,no
+33,Hydraulics,Nozzle,"Brass solid stream, 3.0 mm, ¼ in MPT",1,8,no
+34,Hydraulics,Garden hose,"⅝ in, 25 ft",1,20,no
+35,Site & power,Post,"¾ in galvanised steel pipe, 60 in",1,20,no
+36,Site & power,Concrete,"20 kg bag, fast-setting",1,7,no
+37,Site & power,Conduit,"¾ in PVC with fittings, 6 m",1,20,no
+38,Site & power,Power cable,"16/2 landscape cable, 15 m",1,20,no
+39,Site & power,Data cable,"Cat6 outdoor, gel-filled, 15 m",1,20,no
+40,Site & power,Soil probes,Capacitive v1.2,3,9.9,no
+41,Site & power,Probe cable,"3-core shielded 22 AWG, 30 m",1,15,no
+42,Site & power,24 V power supply,"Mean Well LRS-100-24, 24 V 4.5 A",1,16.48,yes
+43,Site & power,Supply housing,"Weatherproof box, cord and strain relief",1,15,no
+44,Site & power,Filament,"ASA and PETG, about 0.5 kg",1,15,no
