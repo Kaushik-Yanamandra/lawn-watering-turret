@@ -1,118 +1,118 @@
 # 💧 Lawn Watering Turret
 
-A camera-guided turret that waters only the parts of a lawn that are actually dry.
+**A camera-guided water turret that finds the dry patches of a lawn and waters only those, one aimed jet at a time.**
 
-Timer sprinklers soak the whole yard on a schedule. They overwater spots that are fine and still miss the dry ones. This system looks at the lawn with a thermal camera, finds the dry 1 m × 1 m patches, and aims a single jet of water at each one, dosing by measured litres. In simulation it uses about 80% less water than a uniform 10 mm on every cell.
+Kaushik Yanamandra · Independent engineering project · Houston, Texas · 2026
 
-> **Status: Rev B design, prototype in progress.**
-> The design went through an adversarial design review in November 2026 ([findings](docs/design-review-rev-b.md)), and Rev B fixes everything it found. The Pi software, simulator, ESP32 firmware and CAD scripts are now in this repo, and 12 software tests pass. Parts are being 3D-printed for the first prototype. The hardware has **not** been built or tested yet, and the Rev B firmware has **not** been compiled. The figures below are design and simulation numbers, not measurements.
+A timer sprinkler waters the whole yard on a schedule: it overwaters the spots that are fine and still misses the ones that are dry. This system looks at the lawn with a thermal camera in the afternoon, works out which 1 m × 1 m patches are dry, and at dawn aims a single jet of water at each one, measuring every litre. In simulation it uses **82% less water** than giving every patch the same 10 mm.
+
+The project runs through four engineering disciplines at once: the **electronics** that keep water from running when something fails, the **mechanism and plumbing** that point a pressurised jet, the **materials** that survive Texas sun, and the **flight physics** that predict where a jet of water lands in wind.
+
+> **Status (November 2026):** designed, simulated and reviewed; prototype parts being 3D-printed. The software, firmware, CAD and drawings are all in this repo, and 12 software tests pass. The hardware has **not** been built or tested yet, and the ESP32 firmware has **not** been compiled. Every number below is a design or simulation figure, not a measurement.
 
 ![Pan/tilt head assembly](hardware/drawings/LWT-A1_head-assembly.svg)
 
 ---
 
-## How it works
-
-The system has two units connected by a buried 24 V power cable and a Cat6 data cable.
+## The system in one minute
 
 | Unit | Where | What it does |
 |---|---|---|
-| **Sensor Unit** | Pole or eave, ~5 m high, ~5 m behind the turret | Raspberry Pi 5 with a wide visible camera and an MLX90640 thermal camera. It does the thinking: finds dry cells, plans the water, and checks where each shot lands. |
-| **Turret Unit** | ¾ in steel post at the lawn edge, nozzle 1.02 m above grade | ESP32 node, pan/tilt servo head, master and zone valves, flow meter and pressure sensor. Everything that touches water lives here. |
+| **Sensor Unit** | Pole or eave, ~5 m up, behind the turret | Raspberry Pi 5 with a wide camera and an MLX90640 thermal camera. Finds dry patches, plans the water, and watches where each shot lands. |
+| **Turret Unit** | Steel post at the lawn edge, nozzle 1.02 m above the grass | ESP32 controller, pan/tilt servo head, two valves, flow meter and pressure sensor. Everything that touches water is here. |
 
-The Sensor Unit sits high so that one fixed camera view covers the whole lawn. A camera at nozzle height could not see it all.
-
-**Daily cycle**
-
-| Time | What happens | Why then |
+| When | What happens | Why then |
 |---|---|---|
-| 13:15 | Thermal scan (about 1 minute). Each cell is scored against the lawn median. Low-contrast scans are rejected. | Thermal contrast between dry and healthy grass peaks in early afternoon. |
-| Sunrise + 15 min | Pre-checks, then 20–40 minutes of watering, at most 5 mm per cell per pass (cycle and soak). The job starts at 05:30 and waits for daylight. | Wind and evaporation are lowest at dawn, and the camera needs daylight to see where check shots land. |
-| Monthly | Calibration: 16 test shots on a calm, dry late morning. | Keeps the aiming model matched to the real nozzle and pressure. |
+| 13:15 | Thermal scan. Each patch's temperature is compared with the lawn's middle value; dry grass runs hotter. | Contrast between dry and healthy grass peaks in early afternoon. |
+| Sunrise + 15 min | Watering: at most 5 mm per patch per pass, with soak time between passes. | Wind and evaporation are lowest, and the camera needs daylight to see where shots land. |
+| Monthly | Calibration: 16 test shots, fitted to the jet model. | Keeps the model matched to the real nozzle and water pressure. |
 
-Watering is skipped if 3 mm of rain has fallen since the scan, 6 mm or more is forecast in the next 24 hours, wind is over 4 m/s or gusts over 7 m/s, the plan is more than 20 hours old, or it is already more than 2 hours after sunrise.
+---
 
-## Key design numbers
+## Engineering by discipline
 
-| | |
-|---|---|
-| Reach | 1.0 m to about 9 m at 25 psi (model: 8.9–9.6 m depending on air drag). Plan the lawn to 8.5 m until calibration measures it. |
-| Jet flow | About 7 L/min through a 3 mm orifice |
-| Aiming accuracy, still air | 0.05 m median miss, 90% of shots within 0.11 m (simulated, including servo error and pressure scatter) |
-| Aiming accuracy, 2.5 m/s crosswind | 0.28 m median, 90% within 0.67 m with camera wind correction (0.56 m / 1.03 m without) |
-| Session length | 20–40 min for a 100 m² lawn |
-| Power | 24 V DC, ~21 W typical, ~72 W peak |
-| Parts cost | ~$976 across 47 parts-list lines (estimates; see [bom.csv](hardware/bom.csv)) |
+### Electrical and computer engineering
 
-## Design highlights
+- **Safety lives next to the valve, not in the computer.** The Pi can ask for water but cannot hold a valve open. The ESP32 closes both valves on its own within 3 s if the link goes quiet, and no opening can last more than 120 s. Both valves are normally closed, so a power cut shuts them with a spring. → [firmware](firmware/turret_node/turret_node.ino), [safety and faults](docs/safety-and-faults.md)
+- **Six latched fault types:** lost link, no flow, low pressure, burst hose (too much flow), valve stuck open, and valve open too long. A stuck-open fault is saved to flash so it survives a reboot.
+- **A protocol that cannot double-water.** The Pi and ESP32 talk over RS-485 at 115200 baud with a checksum on every message. Each dose carries an ID, so a repeated command after a lost reply is recognised instead of watering twice. → [protocol](electronics/README.md#command-link-pi--turret-node-rev-b)
+- **Power design:** 24 V outdoor-safe supply, separate converters for servos and logic so servo current spikes can't reset the controller, reverse-polarity and surge protection on every long cable, MOSFET valve drivers that hold the valves shut while the chip boots. → [electronics](electronics/README.md), [schematic](hardware/drawings/LWT-E1_turret-node-schematic.svg)
+- **Sensing and vision:** a flow meter counted by interrupt, a pressure transducer, three soil-moisture probes, camera lens calibration, pixel-to-ground mapping, and spotting where water landed by comparing frames. → [`software/turret/vision.py`](software/turret/vision.py)
 
-- **The valves are owned by the turret, not the computer.** If the Pi crashes or the cable is cut, the ESP32 closes the valves on its own within 3 seconds. No single opening can last more than 120 seconds. Both valves are normally closed, so a power cut shuts them with a spring. See [docs/safety-and-faults.md](docs/safety-and-faults.md).
-- **Two valves in series.** A master valve upstream of the zone valve means a zone valve stuck open can still be shut off. The node watches for flow while both are closed and latches a stuck-open fault that survives a reboot.
-- **A retried command can never water twice.** Every dose carries an ID. If the Pi resends a dose because a reply was lost, the node recognises the ID and does not start again.
-- **Every dose is checked.** The flow meter counts pulses (~450 per litre) and closes the valve at the target volume. The Pi checks each result; a dose that ends short or by timeout stops the session and sends an alert.
-- **Zero torque from the jet.** Both servo axes pass through the nozzle axis, so the jet's reaction force puts no torque on either servo. A lazy-susan bearing carries the head's weight.
-- **Aiming with air drag, wind and pressure.** The ballistic model includes quadratic air drag and wind, is fitted to the real nozzle by calibration shots, rescales itself to the measured nozzle pressure, and updates its wind estimate from check shots seen by the camera. See [docs/aiming-model.md](docs/aiming-model.md).
-- **Separate power rails.** Servos get their own 6 V, 8–10 A rail so their current spikes cannot reset the ESP32.
+### Mechanical engineering
+
+- **A pan/tilt head with zero torque from the jet.** Both rotation axes pass through the nozzle, so the jet's ~1.9 N reaction force puts no twisting load on either servo. A lazy-susan bearing carries the head's weight; the servo only turns it. → [head assembly](hardware/drawings/LWT-A1_head-assembly.svg)
+- **Ten parametric 3D-printed parts** (23 prints) generated by one script, with drawings for each. Change a measured dimension at the top of the script and every part, STL and drawing updates. → [`cad/lwt_parts.py`](cad/lwt_parts.py), [drawings](cad/sheets/)
+- **Hydraulics:** pressure regulator, filter, two valves in series, flow and pressure sensing, water-hammer arrestor and freeze drain, sized so the nozzle sees a steady 22–25 psi whatever the street pressure does. → [system overview](docs/system-overview.md)
+- **Design for manufacture:** print orientation chosen part by part for flat mating faces and minimal supports, fit-test slices before full prints, and ready-to-print plates for a Bambu Lab P2S. → [print guide](cad/print/bambu-p2s/)
+
+### Materials science
+
+- **Choosing plastics for 60 °C sun.** ASA for parts in direct sun (UV-stable, softens around 100 °C), PETG for shaded parts and clips that must flex, and **no PLA**, which softens near 60 °C. → [materials selection](docs/materials-selection.md)
+- **Designing around how prints fail.** 3D-printed parts are weakest between layers, so each part's orientation is chosen with its loads in mind. Brass heat-set inserts need enough plastic around them: the review found inserts that would have broken through a 5 mm plate, and Rev B adds bosses behind them.
+- **Metals outdoors:** galvanised steel post, brass fittings, stainless fasteners, and the corrosion questions that come with mixing them.
+
+### Aerospace engineering
+
+- **Trajectory with air drag and wind.** The water jet is modelled as a projectile with quadratic drag, integrated with a 4th-order Runge–Kutta method: the same exterior-ballistics approach used for projectiles and sounding rockets. A plain no-drag formula overshoots badly at these speeds. → [aiming model](docs/aiming-model.md), [`software/turret/ballistics.py`](software/turret/ballistics.py)
+- **Aiming is an inverse problem.** Given a target, the solver finds the low-arc tilt by bisection, then corrects pan and tilt for the current wind.
+- **Closed-loop correction in flight conditions.** The camera sees where check shots actually land; the difference from the prediction updates a running wind estimate, with outlier rejection, much like correcting a guidance model from observed miss distances.
+- **System identification and error budget.** Jet speed, drag and aim offsets are fitted from 16 calibration shots by least squares. The error budget accounts for servo error (0.25°), pressure scatter (0.6% jet speed) and gusts: at 8 m, each moves the landing about 4 cm.
+
+---
+
+## Results so far (simulation)
+
+| Case | Typical miss | 90% of shots within |
+|---|---|---|
+| Datasheet model, no calibration | 0.65 m | 1.12 m |
+| **Calibrated, still air** | **0.05 m** | **0.11 m** |
+| 2.5 m/s crosswind, no correction | 0.56 m | 1.03 m |
+| **Same wind, camera wind correction** | **0.28 m** | **0.67 m** |
+
+The lawn is divided into 1 m patches, so a 0.11 m miss lands well inside its patch. Calibration cuts the miss more than tenfold; camera feedback halves it in wind. Reach is 1.0 m to about 9 m at 25 psi; the lawn is planned to 8.5 m until real calibration measures it.
+
+![Simulation results](software/sim_results.png)
+
+## Design review
+
+Before building anything, the whole design went through an adversarial review: every part of it was assumed wrong until shown otherwise. That review found **19 problems**: 7 that would have stopped the system working or caused damage (watering in the dark when the camera can't see, a valve that could stick open unnoticed, a retried command that could water twice, a jet that could hit its own head) and 12 that would have made it worse than claimed, including accuracy figures that ignored real servo error. Rev B fixes all of them. → [design review and Rev B changes](docs/design-review-rev-b.md)
+
+## Roadmap
+
+- [x] System design and requirements
+- [x] Mechanical drawings, parametric CAD and STL files
+- [x] Pi software, ESP32 firmware and full simulation
+- [x] Adversarial design review and Rev B fixes
+- [ ] Compile the Rev B firmware *(next)*
+- [ ] Print and fit-test parts *(in progress)*
+- [ ] Bench test: ESP32, both valves and one servo
+- [ ] Build the head and valve train, install, calibrate
+- [ ] Two weeks of field testing and a results write-up comparing measured accuracy and water use with the simulation
 
 ## Try the software
 
-Everything runs on a normal PC first, against a simulated turret:
+Everything runs on a normal PC against a simulated turret:
 
 ```
 cd software
 pip install -r requirements.txt
 python simulate.py              # calibration, aim tests and a windy dawn session; writes sim_results.png
-python tests/test_link.py       # RS-485 protocol tests against a fake Turret Node
+python tests/test_link.py       # RS-485 protocol tests against a fake turret controller
 python tests/test_controller.py # dosing, pressure and stop-rule tests
 ```
-
-![Simulation results](software/sim_results.png)
 
 ## Repository layout
 
 ```
-docs/
-  system-overview.md       units, power budget, water train
-  safety-and-faults.md     how the system fails safe
-  aiming-model.md          ballistics, calibration and accuracy
-  build-plan.md            build phases A–F and acceptance tests
-  design-review-rev-b.md   what the Rev B review found and what changed
-electronics/
-  README.md                Turret Node and Sensor Unit circuits
-hardware/
-  README.md                3D-printed parts and drawing index
-  bom.csv                  full parts list with cost estimates
-  drawings/                Rev A drawing set (9 sheets, SVG)
-software/
-  turret/                  Python package: ballistics, calibration, vision, planner, hardware, controller
-  run_pi.py                Pi commands for cron: markers, calibrate, scan, water, status, clear-stuck
-  simulate.py              desktop simulation of a full watering session
-  tests/                   protocol and controller tests
-  tools/calibrate_lens.py  camera lens calibration from a checkerboard
-firmware/
-  turret_node/             ESP32 Turret Node firmware (Arduino, Rev B)
-cad/
-  lwt_parts.py             parametric models of printed parts P1–P9
-  drawings.py              drawing sheets and assembly render
-  stl/                     STL files ready to slice (Rev B)
-  print/bambu-p2s/         Bambu Lab P2S plate files (3 plates, per-part settings) and print guide
-  sheets/                  Rev B drawing sheets (PNG)
+docs/                      system overview, safety, aiming model, materials, build plan, design review
+electronics/               Turret Node and Sensor Unit circuits, command protocol
+hardware/                  parts list (bom.csv), drawing set (SVG), printed-part list
+software/                  Python: ballistics, calibration, vision, planner, controller, simulator, tests
+firmware/turret_node/      ESP32 controller firmware (Arduino C++)
+cad/                       parametric CAD script, STL files, drawing sheets, Bambu Lab P2S print plates
 ```
-
-## Roadmap
-
-- [x] System design and design document (Rev A)
-- [x] Mechanical drawings (9 sheets)
-- [x] Aiming simulation
-- [x] Pi software, ESP32 firmware and CAD scripts
-- [x] Adversarial design review and Rev B fixes
-- [ ] Compile the Rev B firmware *(next)*
-- [ ] Print and fit-test parts *(in progress; reprint P2 and P5 from the Rev B STL files)*
-- [ ] Bench test: ESP32, both valves and one servo (`PING`, `MOVE`, `VALVE`, `DOSE`)
-- [ ] Build the head and valve train
-- [ ] Install, calibrate the camera lens and the jet (accept if RMS residual < 0.10 m)
-- [ ] Two weeks of field testing and results write-up
 
 ## Built with
 
-Raspberry Pi 5 · ESP32 · Python · Arduino (C++) · RS-485 · OpenCV · 3D printing (ASA/PETG) · thermal imaging
+Raspberry Pi 5 · ESP32 · Python (NumPy, SciPy, OpenCV) · Arduino C++ · RS-485 · thermal imaging · parametric CAD (manifold3d, trimesh) · 3D printing (ASA, PETG)
