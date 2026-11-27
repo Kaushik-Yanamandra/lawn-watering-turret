@@ -95,6 +95,7 @@ cad/
   lwt_parts.py             parametric models of printed parts P1–P9
   drawings.py              drawing sheets and assembly render
   stl/                     STL files ready to slice (Rev B)
+  print/bambu-p2s/         Bambu Lab P2S plate files (3 plates, per-part settings) and print guide
   sheets/                  Rev B drawing sheets (PNG)
 ```
 

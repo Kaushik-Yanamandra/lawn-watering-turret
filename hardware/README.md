@@ -30,7 +30,7 @@
 | P8 | Thermal visor | 1 | ASA |
 | P9 | Thermal carrier | 1 | PETG |
 
-STL files: [`cad/stl/`](../cad/stl). **Rev B changed two parts:** P2 no longer has the hose pass-through over the bearing race (the tube runs in a service loop on two new zip-tie holes), and P5's heat-set insert pilots are now blind, with 11 mm bosses behind them so the inserts cannot break through the plate. Reprint P2 and P5 if you printed Rev A.
+STL files: [`cad/stl/`](../cad/stl). **Printing on a Bambu Lab P2S:** ready-made plate files (all 23 parts on 3 plates, with per-part settings) and the Bambu Studio presets to use are in [`cad/print/bambu-p2s/`](../cad/print/bambu-p2s). **Rev B changed two parts:** P2 no longer has the hose pass-through over the bearing race (the tube runs in a service loop on two new zip-tie holes), and P5's heat-set insert pilots are now blind, with 11 mm bosses behind them so the inserts cannot break through the plate. Reprint P2 and P5 if you printed Rev A.
 
 **Print settings:** 0.2 mm layers, 4 perimeters, 40% gyroid infill; P1–P3 at 60%. Print a 10 mm fit slice of P1 and P3 first to check the servo pocket, post bore and hex pocket.
 

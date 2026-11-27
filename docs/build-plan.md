@@ -5,7 +5,7 @@
 ## Phase A — Print and prepare (bench)
 1. Measure the actual servos, bearing and brass fittings; update the parameters at the top of [`cad/lwt_parts.py`](../cad/lwt_parts.py) and regenerate the STL files.
 2. Print 10 mm fit slices of P1 (servo pocket, post bore) and P3 (hex pocket). Adjust until they fit.
-3. Print all 23 parts from [`cad/stl/`](../cad/stl) (Rev B: P2 and P5 changed; reprint them if you printed Rev A): 0.2 mm layers, 4 perimeters, 40% gyroid infill; P1–P3 at 60%. ASA needs an enclosure and a 100–110 °C bed.
+3. Print all 23 parts from [`cad/stl/`](../cad/stl): 0.2 mm layers, 4 perimeters, 40% gyroid infill; P1–P3 at 60%. ASA needs an enclosure and a 100–110 °C bed. On a Bambu Lab P2S, use the three ready-made plate files and guide in [`cad/print/bambu-p2s/`](../cad/print/bambu-p2s). (Rev B changed P2 and P5; reprint them if you printed Rev A.)
 4. Press in heat-set inserts straight with a flat tip: 260 °C for ASA, 245 °C for PETG.
 
 ## Phase B — Electronics (bench)
