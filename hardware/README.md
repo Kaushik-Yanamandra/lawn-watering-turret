@@ -1,14 +1,17 @@
 # Hardware
 
-- [bom.csv](bom.csv): 44 parts-list lines, about $776 in total. Lines marked `yes` had their price checked on 22 Oct 2026; the rest are typical US retail estimates.
+- [bom.csv](bom.csv): 47 parts-list lines, about $976 in total (Rev B). Lines marked `yes` had their price checked on 22 Oct 2026; the rest, including every Rev B line, are typical US retail estimates.
 - [drawings/](drawings): Rev A drawing set, 9 sheets, A3, third-angle projection, millimetres.
+- [../cad/](../cad): the parametric CAD script that generates every printed part, the Rev B STL files and Rev B drawing sheets.
+
+**Rev B changes the parts list by about $200**, mostly in the water train: a master valve, assisted-lift valves that open at low pressure, an ASSE 1020 pressure vacuum breaker, a 0–30 psi sensor, a drain cock and a water-hammer arrestor. It also uses a bigger servo buck and an outdoor Class 2 supply. See [design-review-rev-b.md](../docs/design-review-rev-b.md).
 
 | Group | Estimated cost |
 |---|---|
-| Sensor Unit | ~$332 |
-| Turret Unit | ~$160 |
-| Hydraulics | ~$126 |
-| Site & power | ~$158 |
+| Sensor Unit | ~$337 |
+| Turret Unit | ~$171 |
+| Hydraulics | ~$296 |
+| Site & power | ~$172 |
 
 ## 3D-printed parts
 
@@ -27,9 +30,13 @@
 | P8 | Thermal visor | 1 | ASA |
 | P9 | Thermal carrier | 1 | PETG |
 
+STL files: [`cad/stl/`](../cad/stl). **Rev B changed two parts:** P2 no longer has the hose pass-through over the bearing race (the tube runs in a service loop on two new zip-tie holes), and P5's heat-set insert pilots are now blind, with 11 mm bosses behind them so the inserts cannot break through the plate. Reprint P2 and P5 if you printed Rev A.
+
 **Print settings:** 0.2 mm layers, 4 perimeters, 40% gyroid infill; P1–P3 at 60%. Print a 10 mm fit slice of P1 and P3 first to check the servo pocket, post bore and hex pocket.
 
 ## Drawing set (Rev A)
+
+These SVG sheets are Rev A. The P2 and P5 sheets and the E1 schematic do not yet show the Rev B changes; Rev B drawing sheets for every printed part, generated from the CAD script, are in [`cad/sheets/`](../cad/sheets).
 
 | Sheet | Title | Scale | What it shows |
 |---|---|---|---|

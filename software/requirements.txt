@@ -1,0 +1,14 @@
+# Pi software and desktop simulation (Windows/Mac/Linux)
+numpy
+scipy
+opencv-python
+matplotlib
+pyserial
+
+# CAD regeneration (cad/lwt_parts.py, cad/drawings.py)
+trimesh
+manifold3d
+
+# Raspberry Pi only (picamera2 comes with Raspberry Pi OS: sudo apt install python3-picamera2)
+# adafruit-circuitpython-mlx90640
+# gpiozero
